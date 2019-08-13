@@ -7,9 +7,11 @@ def default_loader(path):
 class MyDataset(Dataset):
     def __init__(self, txt, transform=None, target_transform=None, loader = default_loader):
         fh = open(txt, 'r')
+        pdb.set_trace()
         imgs = []
         # import pdb; pdb.set_trace()
         for line in fh:
+            # 读取一行
             line = line.strip('\n')
             line = line.rstrip()
             words = line.split()
@@ -17,7 +19,7 @@ class MyDataset(Dataset):
                 words[0] = str((words[0]))+' '+str((words[1]))
                 words[1] = words[2]
             # print(len(words))
-
+            # ims:[('./data/wcedata/train/normal/normal.283.jpg', 2), ('./data/wcedata/train/normal/normal.412.jpg', 2)]
             imgs.append((words[0],int(words[1])))
             # print(words[0],int(words[1]))
         self.imgs = imgs
