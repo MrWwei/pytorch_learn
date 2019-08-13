@@ -7,7 +7,7 @@ def default_loader(path):
 class MyDataset(Dataset):
     def __init__(self, txt, transform=None, target_transform=None, loader = default_loader):
         fh = open(txt, 'r')
-        pdb.set_trace()
+        # pdb.set_trace()
         imgs = []
         # import pdb; pdb.set_trace()
         for line in fh:

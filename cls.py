@@ -21,26 +21,26 @@ plt.ion()   # interactive mode
 
 # Data augmentation and normalization for training
 # Just normalization for validation
-# data_transforms = {
-#     'train': transforms.Compose([
-#         transforms.RandomResizedCrop(224),
-#         transforms.RandomHorizontalFlip(),
-#         transforms.ToTensor(),
-#         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
-#     ]),
-#     'val': transforms.Compose([
-#         transforms.Resize(256),
-#         transforms.CenterCrop(224),
-#         transforms.ToTensor(),
-#         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
-#     ]),
-# }
-data_transforms = transforms.Compose([
+data_transforms = {
+    'train': transforms.Compose([
         transforms.RandomResizedCrop(224),
         transforms.RandomHorizontalFlip(),
         transforms.ToTensor(),
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
-    ])
+    ]),
+    'val': transforms.Compose([
+        transforms.Resize(256),
+        transforms.CenterCrop(224),
+        transforms.ToTensor(),
+        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+    ]),
+}
+# data_transforms = transforms.Compose([
+#         transforms.RandomResizedCrop(224),
+#         transforms.RandomHorizontalFlip(),
+#         transforms.ToTensor(),
+#         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+#     ])
 
 # data_dir = 'data/wcedata'
 # image_datasets = {x: datasets.ImageFolder(os.path.join(data_dir, x),
@@ -64,7 +64,7 @@ valdataset = MyDataset(val_txt,data_transforms)
 # valdataset = MyDataset(val_txt,data_transforms,data_transforms)
 # # pdb.set_trace()
 
-image_datasets = {'train': MyDataset(train_txt,data_transforms),'val':MyDataset(val_txt,data_transforms)}
+image_datasets = {'train': MyDataset(train_txt,data_transforms['train']),'val':MyDataset(val_txt,data_transforms['val'])}
 dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=4,
                                              shuffle=True, num_workers=4)
               for x in ['train', 'val']}
@@ -209,5 +209,5 @@ exp_lr_scheduler = lr_scheduler.StepLR(optimizer_ft, step_size=7, gamma=0.1)
 
 model_ft = train_model(model_ft, criterion, optimizer_ft, exp_lr_scheduler,
                        num_epochs=25)
-
+torch.save(model_ft.cpu().state_dict(),'./model_25.pth')
 
