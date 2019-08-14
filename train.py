@@ -1,5 +1,4 @@
-# License: BSD
-# Author: Sasank Chilamkurthy
+# Author: Wentao WEI
 
 from __future__ import print_function, division
 
