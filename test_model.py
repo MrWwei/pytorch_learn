@@ -1,3 +1,4 @@
+# Author: Wentao WEI
 import torchvision
 from torchvision import datasets, models, transforms
 import torch.nn as nn
