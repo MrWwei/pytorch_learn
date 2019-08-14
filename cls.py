@@ -54,7 +54,7 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
                          
 dataset_sizes = {x: len(image_datasets[x]) for x in ['train', 'val']}
 
-class_names = image_datasets['train'].classes
+class_names = {'0':0,'1':1,'2':2}
 
 def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
     since = time.time()
@@ -160,7 +160,7 @@ def visualize_model(model, num_images=6):
                 ax.axis('off')
                 pdb.set_trace()
                 # test = 'predicted: {}'.format(class_names[preds[j]])
-                ax.set_title('predicted: {}'.format(class_names[preds[j]]))
+                ax.set_title('predicted: {}'.format(class_names[int(preds[j])]))
                 
                 imshow(inputs.cpu().data[j])
 
