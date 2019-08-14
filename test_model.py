@@ -7,7 +7,7 @@ from PIL import Image
 import pdb
 import numpy as np
 '''
-pytorch单张图片分类
+pytorch单张或者多张图片分类测试
 '''
 def default_loader(path):
     return Image.open(path).convert('RGB')
@@ -26,6 +26,7 @@ model_ft.load_state_dict(torch.load('./model_25.pth'))
 # eval模式与train不同点：eval会取消bn和dropout
 model_ft.eval()
 
+# 对图片进行转化处理
 transforms=transforms.Compose([
         transforms.RandomResizedCrop(224),
         transforms.RandomHorizontalFlip(),
@@ -45,9 +46,19 @@ img2 = img2.unsqueeze(0)
 
 imgs = np.concatenate((img1,img2))
 
+labels = []
+paths = [path1,path2]
+for path in paths:
+    if path.split('/')[-2] == 'bleeding':
+        labels.append(0) 
+    elif path.split('/')[-2] == 'colon':
+        labels.append(1)
+    else:
+        labels.append(2)
 
-labels = [1,0]
 
+
+print(labels)
 # numpy转成Tensor
 input = torch.tensor(imgs)
 
@@ -58,11 +69,11 @@ input = input.to(device)
 model_ft.to(device)
 output = model_ft(input)
 _, preds = torch.max(output, 1)
+# print(preds)
 for idx,pred in enumerate(preds):
     if int(pred) == labels[idx]:
         print('right')
     else:
         print('error')
 
-# print(preds)
 
