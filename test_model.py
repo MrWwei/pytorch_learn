@@ -12,13 +12,18 @@ pytorch单张图片分类
 def default_loader(path):
     return Image.open(path).convert('RGB')
 
+# 描述模型
 model_ft = models.resnet18(pretrained=True)
 num_ftrs = model_ft.fc.in_features
 
 model_ft.fc = nn.Linear(num_ftrs, 3)
-device = torch.device("cpu")
 
+
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
+# 加载权重参数
 model_ft.load_state_dict(torch.load('./model_25.pth'))
+# eval模式与train不同点：eval会取消bn和dropout
 model_ft.eval()
 
 transforms=transforms.Compose([
@@ -28,24 +33,36 @@ transforms=transforms.Compose([
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
     ])
 # 单张图片
-img = default_loader('data/wcedata/val/colon/colon.47.jpg')
-img = transforms(img)
-img = img.unsqueeze(0)
-
-img1 = default_loader('data/wcedata/val/bleeding/bleeding.47.jpg')
+path1 = 'data/wcedata/val/colon/colon.47.jpg'
+img1 = default_loader(path1)
 img1 = transforms(img1)
 img1 = img1.unsqueeze(0)
 
-imgs = np.concatenate((img,img1))
+path2 = 'data/wcedata/val/bleeding/bleeding.47.jpg'
+img2 = default_loader(path2)
+img2 = transforms(img2)
+img2 = img2.unsqueeze(0)
+
+imgs = np.concatenate((img1,img2))
+
+
+labels = [1,0]
 
 # numpy转成Tensor
 input = torch.tensor(imgs)
 
 # 多张图片
 # pdb.set_trace()
-input.to(device)
+# 如果直接input.to(device)会报错：‘Input type (torch.FloatTensor) and weight type (torch.cuda.FloatTensor) should be the same’
+input = input.to(device)
 model_ft.to(device)
 output = model_ft(input)
 _, preds = torch.max(output, 1)
-print(preds)
+for idx,pred in enumerate(preds):
+    if int(pred) == labels[idx]:
+        print('right')
+    else:
+        print('error')
+
+# print(preds)
 
