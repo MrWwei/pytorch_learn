@@ -2,6 +2,8 @@ from torch.utils.data import Dataset
 from PIL import Image
 import numpy as np
 import pdb
+import torch
+
 def default_loader(path):
     return Image.open(path).convert('RGB')
 class MyDataset(Dataset):
@@ -26,6 +28,7 @@ class MyDataset(Dataset):
         self.transform = transform
         self.target_transform = target_transform
         self.loader = loader
+        self.classes = {'bleeding': 0, 'colon': 1, 'normal': 2}
         fh.close()
 
     def __getitem__(self, index):
@@ -38,6 +41,7 @@ class MyDataset(Dataset):
         if self.transform is not None:
             img = self.transform(img)
             # label = self.transform(label)
+        # label = torch.IntTensor(label)
         return img,label
 
     def __len__(self):
