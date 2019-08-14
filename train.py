@@ -201,7 +201,8 @@ model_ft = train_model(model_ft, criterion, optimizer_ft, exp_lr_scheduler,
                        num_epochs=25)
 
 # 保存最好的模型，cpu模式保存模型
-model_ft.load_state_dict(torch.load('./model_best.pth'))
+# model_ft.save('./model_best.pth')
+torch.save(model_ft.state_dict(),'./model_best.pth')
 
 visualize_model(model_ft)
 
