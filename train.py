@@ -46,6 +46,13 @@ dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=4,
                                              shuffle=True, num_workers=4)
               for x in ['train', 'val']}
 
+# for inputs, labels in dataloaders['val']:
+#     pdb.set_trace()
+#     print(inputs)
+#     print(labels)
+    # print(labels)
+    # labels = torch.from_numpy(labels)
+
 dataset_sizes = {x: len(image_datasets[x]) for x in ['train', 'val']}
 print(dataset_sizes)
 
@@ -79,10 +86,12 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
 
             # Iterate over data.
             for inputs, labels in dataloaders[phase]:
+                # pdb.set_trace()
                 inputs = inputs.to(device)
-                labels = np.asarray(labels)
+                # labels的Tensor类型转成numpy类型
+                # labels = np.asarray(labels)
                 # print(labels)
-                labels = torch.from_numpy(labels)
+                # labels = torch.from_numpy(labels)
 
                 labels = labels.to(device)
 
@@ -169,7 +178,7 @@ def visualize_model(model, num_images=6):
                     return
         model.train(mode=was_training)
 
-
+# 模型层
 model_ft = models.resnet18(pretrained=True)
 num_ftrs = model_ft.fc.in_features
 
@@ -177,9 +186,11 @@ model_ft.fc = nn.Linear(num_ftrs, 3)
 
 model_ft = model_ft.to(device)
 
+# 损失函数
 criterion = nn.CrossEntropyLoss()
 
 # Observe that all parameters are being optimized
+# 优化器
 optimizer_ft = optim.SGD(model_ft.parameters(), lr=0.001, momentum=0.9)
 
 # Decay LR by a factor of 0.1 every 7 epochs
