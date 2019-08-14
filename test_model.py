@@ -67,7 +67,7 @@ input = torch.tensor(imgs)
 # pdb.set_trace()
 # 如果直接input.to(device)会报错：‘Input type (torch.FloatTensor) and weight type (torch.cuda.FloatTensor) should be the same’
 input = input.to(device)
-model_ft.to(device)
+model_ft = model_ft.to(device)
 output = model_ft(input)
 _, preds = torch.max(output, 1)
 # print(preds)
