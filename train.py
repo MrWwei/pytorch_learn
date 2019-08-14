@@ -16,7 +16,8 @@ import copy
 from torch.autograd import Variable
 from mydataset import *
 import pdb
-plt.ion()   # interactive mode
+
+plt.ion()  # interactive mode
 
 # Data augmentation and normalization for training
 # Just normalization for validation
@@ -37,30 +38,31 @@ data_transforms = {
 train_txt = 'data/wcedata/train.txt'
 val_txt = 'data/wcedata/val.txt'
 # 创建自己的dataset
-traindataset = MyDataset(train_txt,data_transforms)
-valdataset = MyDataset(val_txt,data_transforms)
+traindataset = MyDataset(train_txt, data_transforms)
+valdataset = MyDataset(val_txt, data_transforms)
 
-image_datasets = {'train': MyDataset(train_txt,data_transforms['train']),'val':MyDataset(val_txt,data_transforms['val'])}
+image_datasets = {'train': MyDataset(train_txt, data_transforms['train']),
+                  'val': MyDataset(val_txt, data_transforms['val'])}
 dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=4,
-                                             shuffle=True, num_workers=4)
-              for x in ['train', 'val']}
+                                              shuffle=True, num_workers=4)
+               for x in ['train', 'val']}
 
 # for inputs, labels in dataloaders['val']:
 #     pdb.set_trace()
 #     print(inputs)
 #     print(labels)
-    # print(labels)
-    # labels = torch.from_numpy(labels)
+# print(labels)
+# labels = torch.from_numpy(labels)
 
 dataset_sizes = {x: len(image_datasets[x]) for x in ['train', 'val']}
 print(dataset_sizes)
 
-
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-                         
+
 dataset_sizes = {x: len(image_datasets[x]) for x in ['train', 'val']}
 
-class_names = {'0':0,'1':1,'2':2}
+class_names = {'0': 0, '1': 1, '2': 2}
+
 
 def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
     since = time.time()
@@ -78,7 +80,7 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
                 scheduler.step()
                 model.train()  # Set model to training mode
             else:
-                model.eval()   # Set model to evaluate mode
+                model.eval()  # Set model to evaluate mode
 
             running_loss = 0.0
             running_corrects = 0
@@ -135,6 +137,7 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
     model.load_state_dict(best_model_wts)
     return model
 
+
 def imshow(inp, title=None):
     """Imshow for Tensor."""
     inp = inp.numpy().transpose((1, 2, 0))
@@ -145,7 +148,8 @@ def imshow(inp, title=None):
     plt.imshow(inp)
     if title is not None:
         plt.title(title)
-    plt.pause(1)  
+    plt.pause(1)
+
 
 def visualize_model(model, num_images=6):
     was_training = model.training
@@ -164,12 +168,12 @@ def visualize_model(model, num_images=6):
 
             for j in range(inputs.size()[0]):
                 images_so_far += 1
-                ax = plt.subplot(num_images//2, 2, images_so_far)
+                ax = plt.subplot(num_images // 2, 2, images_so_far)
                 ax.axis('off')
                 pdb.set_trace()
                 # test = 'predicted: {}'.format(class_names[preds[j]])
                 ax.set_title('predicted: {}'.format(class_names[int(preds[j])]))
-                
+
                 imshow(inputs.cpu().data[j])
 
                 if images_so_far == num_images:
@@ -177,11 +181,18 @@ def visualize_model(model, num_images=6):
                     return
         model.train(mode=was_training)
 
-# 模型层
-model_ft = models.resnet18(pretrained=True)
-num_ftrs = model_ft.fc.in_features
 
-model_ft.fc = nn.Linear(num_ftrs, 3)
+# 模型层
+# model_ft = models.resnet18(pretrained=True)
+model_ft = models.mobilenet_v2(pretrained=True)
+
+# num_ftrs = model_ft.fc.in_features
+# 拿出来改造
+model_ft.classifier = nn.Sequential(
+            nn.Dropout(0.2),
+            nn.Linear(model_ft.last_channel, 3),
+        )
+# model_ft.fc = nn.Linear(num_ftrs, 3)
 
 model_ft = model_ft.to(device)
 
@@ -195,13 +206,11 @@ optimizer_ft = optim.SGD(model_ft.parameters(), lr=0.001, momentum=0.9)
 # Decay LR by a factor of 0.1 every 7 epochs
 exp_lr_scheduler = lr_scheduler.StepLR(optimizer_ft, step_size=7, gamma=0.1)
 
-
 model_ft = train_model(model_ft, criterion, optimizer_ft, exp_lr_scheduler,
                        num_epochs=25)
 
 # 保存最好的模型，cpu模式保存模型
 # model_ft.save('./model_best.pth')
-torch.save(model_ft.state_dict(),'./model_best.pth')
+torch.save(model_ft.state_dict(), './model_best.pth')
 
-visualize_model(model_ft)
-
+# visualize_model(model_ft)
